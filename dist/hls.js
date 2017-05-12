@@ -15634,7 +15634,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /**
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * XHR based logger
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
 var _logger = _dereq_(53);
 
@@ -15694,14 +15694,16 @@ var XhrLoader = function () {
       stats.tfirst = 0;
       stats.loaded = 0;
       var xhrSetup = this.xhrSetup;
+      var fileType = context.type == undefined ? context.frag.type : context.type;
       if (xhrSetup) {
         try {
-          xhrSetup(xhr, context.url, context.type);
+
+          xhrSetup(xhr, context.url, fileType);
         } catch (e) {
           // fix xhrSetup: (xhr, url) => {xhr.setRequestHeader("Content-Language", "test");}
           // not working, as xhr.setRequestHeader expects xhr.readyState === OPEN
           xhr.open('GET', context.url, true);
-          xhrSetup(xhr, context.url, context.type);
+          xhrSetup(xhr, context.url, fileType);
         }
       }
 
