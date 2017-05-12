@@ -1,6 +1,6 @@
 /**
  * XHR based logger
-*/
+ */
 
 import {logger} from '../utils/logger';
 
@@ -43,22 +43,24 @@ class XhrLoader {
     var xhr, context = this.context;
 
     if (typeof XDomainRequest !== 'undefined') {
-       xhr = this.loader = new XDomainRequest();
+      xhr = this.loader = new XDomainRequest();
     } else {
-       xhr = this.loader = new XMLHttpRequest();
+      xhr = this.loader = new XMLHttpRequest();
     }
     let stats = this.stats;
     stats.tfirst = 0;
     stats.loaded = 0;
     const xhrSetup = this.xhrSetup;
+    const fileType = context.type == undefined ? context.frag.type : context.type;
     if (xhrSetup) {
       try {
-        xhrSetup(xhr, context.url,context.type);
-      } catch(e) {
+
+        xhrSetup(xhr, context.url, fileType);
+      } catch (e) {
         // fix xhrSetup: (xhr, url) => {xhr.setRequestHeader("Content-Language", "test");}
         // not working, as xhr.setRequestHeader expects xhr.readyState === OPEN
         xhr.open('GET', context.url, true);
-        xhrSetup(xhr, context.url,context.type);
+        xhrSetup(xhr, context.url, fileType);
       }
     }
 
@@ -66,7 +68,7 @@ class XhrLoader {
       xhr.open('GET', context.url, true);
     }
     if (context.rangeEnd) {
-      xhr.setRequestHeader('Range','bytes=' + context.rangeStart + '-' + (context.rangeEnd-1));
+      xhr.setRequestHeader('Range', 'bytes=' + context.rangeStart + '-' + (context.rangeEnd - 1));
     }
     xhr.onreadystatechange = this.readystatechange.bind(this);
     xhr.onprogress = this.loadprogress.bind(this);
@@ -79,10 +81,10 @@ class XhrLoader {
 
   readystatechange(event) {
     var xhr = event.currentTarget,
-        readyState = xhr.readyState,
-        stats = this.stats,
-        context = this.context,
-        config = this.config;
+      readyState = xhr.readyState,
+      stats = this.stats,
+      context = this.context,
+      config = this.config;
 
     // don't proceed if xhr has been aborted
     if (stats.aborted) {
@@ -90,7 +92,7 @@ class XhrLoader {
     }
 
     // >= HEADERS_RECEIVED
-    if (readyState >=2) {
+    if (readyState >= 2) {
       // clear xhr timeout and rearm it if readyState less than 4
       window.clearTimeout(this.requestTimeout);
       if (stats.tfirst === 0) {
@@ -99,9 +101,9 @@ class XhrLoader {
       if (readyState === 4) {
         let status = xhr.status;
         // http status between 200 to 299 are all successful
-        if (status >= 200 && status < 300)  {
-          stats.tload = Math.max(stats.tfirst,performance.now());
-          let data,len;
+        if (status >= 200 && status < 300) {
+          stats.tload = Math.max(stats.tfirst, performance.now());
+          let data, len;
           if (context.responseType === 'arraybuffer') {
             data = xhr.response;
             len = data.byteLength;
@@ -110,13 +112,13 @@ class XhrLoader {
             len = data.length;
           }
           stats.loaded = stats.total = len;
-          let response = { url : xhr.responseURL, data : data };
+          let response = {url: xhr.responseURL, data: data};
           this.callbacks.onSuccess(response, stats, context);
         } else {
-            // if max nb of retries reached or if http status between 400 and 499 (such error cannot be recovered, retrying is useless), return error
+          // if max nb of retries reached or if http status between 400 and 499 (such error cannot be recovered, retrying is useless), return error
           if (stats.retry >= config.maxRetry || (status >= 400 && status < 499)) {
-            logger.error(`${status} while loading ${context.url}` );
-            this.callbacks.onError({ code : status, text : xhr.statusText}, context);
+            logger.error(`${status} while loading ${context.url}`);
+            this.callbacks.onError({code: status, text: xhr.statusText}, context);
           } else {
             // retry
             logger.warn(`${status} while loading ${context.url}, retrying in ${this.retryDelay}...`);
@@ -137,7 +139,7 @@ class XhrLoader {
   }
 
   loadtimeout() {
-    logger.warn(`timeout while loading ${this.context.url}` );
+    logger.warn(`timeout while loading ${this.context.url}`);
     this.callbacks.onTimeout(this.stats, this.context);
   }
 
