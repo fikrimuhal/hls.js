@@ -81,7 +81,7 @@ class XhrLoader {
 
   readystatechange(event) {
     var xhr = event.currentTarget,
-      readyState = xhr.readyState,
+      readyState = xhr.readyState_,
       stats = this.stats,
       context = this.context,
       config = this.config;
@@ -99,26 +99,26 @@ class XhrLoader {
         stats.tfirst = Math.max(performance.now(), stats.trequest);
       }
       if (readyState === 4) {
-        let status = xhr.status;
+        let status = xhr.status_;
         // http status between 200 to 299 are all successful
         if (status >= 200 && status < 300) {
           stats.tload = Math.max(stats.tfirst, performance.now());
           let data, len;
           if (context.responseType === 'arraybuffer') {
-            data = xhr.response;
+            data = xhr.response_;
             len = data.byteLength;
           } else {
-            data = xhr.responseText;
+            data = xhr.responseText_;
             len = data.length;
           }
           stats.loaded = stats.total = len;
-          let response = {url: xhr.responseURL, data: data};
+          let response = {url: xhr.responseURL_, data: data};
           this.callbacks.onSuccess(response, stats, context);
         } else {
           // if max nb of retries reached or if http status between 400 and 499 (such error cannot be recovered, retrying is useless), return error
           if (stats.retry >= config.maxRetry || (status >= 400 && status < 499)) {
             logger.error(`${status} while loading ${context.url}`);
-            this.callbacks.onError({code: status, text: xhr.statusText}, context);
+            this.callbacks.onError({code: status, text: xhr.statusText_}, context);
           } else {
             // retry
             logger.warn(`${status} while loading ${context.url}, retrying in ${this.retryDelay}...`);
