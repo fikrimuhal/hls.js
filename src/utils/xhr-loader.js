@@ -64,7 +64,7 @@ class XhrLoader {
       }
     }
 
-    if (!xhr.readyState) {
+    if (!xhr.readyState_) {
       xhr.open('GET', context.url, true);
     }
     if (context.rangeEnd) {
