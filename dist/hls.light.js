@@ -11459,12 +11459,12 @@ var XhrLoader = function () {
       if (xhrSetup) {
         try {
 
-          xhrSetup(xhr, context.url, fileType);
+          xhrSetup(xhr, context.url, fileType, context.responseType);
         } catch (e) {
           // fix xhrSetup: (xhr, url) => {xhr.setRequestHeader("Content-Language", "test");}
           // not working, as xhr.setRequestHeader expects xhr.readyState === OPEN
           xhr.open('GET', context.url, true);
-          xhrSetup(xhr, context.url, fileType);
+          xhrSetup(xhr, context.url, fileType, fileType, context.responseType);
         }
       }
 
